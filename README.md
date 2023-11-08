@@ -23,6 +23,10 @@ Choose your region. EKS is not available in every region, use the Region Table t
 
 Make changes in providers.tf accordingly (region, optionally profile)
 
+## Add account number here
+navigate to file `account.hcl`
+
+aws_account_id = "inseraccountnumber"
 ## terragrunt apply
 ```
 terragrunt init
