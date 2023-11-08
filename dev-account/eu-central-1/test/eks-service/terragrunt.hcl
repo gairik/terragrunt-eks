@@ -9,6 +9,42 @@ include {
 }
 
 
-# These are the variables we have to pass in to use the module specified in the terragrunt configuration above
 inputs = {
+  eks_role_name = "terraform-eks-demo-node"
+  eks_role_policy = {
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  }
+  instance_profile_name = "terraform-eks-demo"
+  worker_policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  cni_policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  ecr_policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  autoscaler_policy = {
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "autoscaling:DescribeAutoScalingGroups",
+          "autoscaling:DescribeAutoScalingInstances",
+          "autoscaling:DescribeLaunchConfigurations",
+          "autoscaling:SetDesiredCapacity",
+          "autoscaling:TerminateInstanceInAutoScalingGroup",
+          "ec2:DescribeInstanceTypes",
+          "autoscaling:DescribeTags",
+          "autoscaling:DescribeLaunchConfigurations"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  }
 }
