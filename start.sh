@@ -1,4 +1,5 @@
 #!/bin/bash
+cd dev-account/eu-central-1/test/eks-service
 
 terragrunt apply -auto-approve
 

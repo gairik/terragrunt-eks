@@ -1,67 +1,32 @@
 resource "aws_iam_role" "demo-node" {
-  name = "terraform-eks-demo-node"
+  name = var.eks_role_name
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      },
-    ]
-  })
-
+  assume_role_policy = jsonencode(var.eks_role_policy)
 }
 
-
 resource "aws_iam_role_policy_attachment" "demo-node-AmazonEKSWorkerNodePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  policy_arn = var.worker_policy_arn
   role = aws_iam_role.demo-node.name
 }
 
 resource "aws_iam_role_policy_attachment" "demo-node-AmazonEKS_CNI_Policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  policy_arn = var.cni_policy_arn
   role = aws_iam_role.demo-node.name
 }
 
 resource "aws_iam_role_policy_attachment" "demo-node-AmazonEC2ContainerRegistryReadOnly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  policy_arn = var.ecr_policy_arn
   role = aws_iam_role.demo-node.name
 }
 
 resource "aws_iam_instance_profile" "demo-node" {
-  name = "terraform-eks-demo"
+  name = var.instance_profile_name
   role = aws_iam_role.demo-node.name
 }
-
 
 resource "aws_iam_role_policy" "autoscaler-policy" {
   name = "autoscaler-policy"
   role = aws_iam_role.demo-node.id
 
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action: [
-        "autoscaling:DescribeAutoScalingGroups",
-        "autoscaling:DescribeAutoScalingInstances",
-        "autoscaling:DescribeLaunchConfigurations",
-        "autoscaling:SetDesiredCapacity",
-        "autoscaling:TerminateInstanceInAutoScalingGroup",
-        "ec2:DescribeInstanceTypes",
-        "autoscaling:DescribeTags",
-        "autoscaling:DescribeLaunchConfigurations"
-      ]
-        Effect   = "Allow"
-        Resource = "*"
-      },
-    ]
-  })
+  policy = jsonencode(var.autoscaler_policy)
 }
